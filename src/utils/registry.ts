@@ -13,23 +13,7 @@ let log = function (info) {
   /* registry hive ids */
   , HKLM = 'HKLM'
   , HKCU = 'HKCU'
-  , HKCR = 'HKCR'
-  , HKU = 'HKU'
-  , HKCC = 'HKCC'
-  , HIVES = [HKLM, HKCU, HKCR, HKU, HKCC]
-
-  /* registry value type ids */
-  , REG_SZ = 'REG_SZ'
-  , REG_MULTI_SZ = 'REG_MULTI_SZ'
-  , REG_EXPAND_SZ = 'REG_EXPAND_SZ'
-  , REG_DWORD = 'REG_DWORD'
-  , REG_QWORD = 'REG_QWORD'
-  , REG_BINARY = 'REG_BINARY'
-  , REG_NONE = 'REG_NONE'
-  , REG_TYPES = [REG_SZ, REG_MULTI_SZ, REG_EXPAND_SZ, REG_DWORD, REG_QWORD, REG_BINARY, REG_NONE]
-
-  /* default registry value name */
-  , DEFAULT_VALUE = ''
+  , HIVES = [HKLM, HKCU]
 
   /* general key pattern */
   , KEY_PATTERN = /(\\[a-zA-Z0-9_\s]+)*/
@@ -53,36 +37,6 @@ let log = function (info) {
  */
 
 const ProcessEnv = process.env
-function ProcessUncleanExitError(message, code):void {
-  if (!(this instanceof ProcessUncleanExitError))
-    return new ProcessUncleanExitError(message, code);
-
-  Error.captureStackTrace(this, ProcessUncleanExitError);
-
-  /**
-   * The error name.
-   * @readonly
-   * @member {string} ProcessUncleanExitError#name
-   */
-  this.__defineGetter__('name', function () { return ProcessUncleanExitError.name; });
-
-  /**
-   * The error message.
-   * @readonly
-   * @member {string} ProcessUncleanExitError#message
-   */
-  this.__defineGetter__('message', function () { return message; });
-
-  /**
-   * The process exit code.
-   * @readonly
-   * @member {number} ProcessUncleanExitError#code
-   */
-  this.__defineGetter__('code', function () { return code; });
-
-}
-
-util.inherits(ProcessUncleanExitError, Error);
 
 /*
  * Captures stdout/stderr for a child process
@@ -146,92 +100,6 @@ function getRegExePath() {
     return "REG";
   }
 }
-
-
-/**
- * Creates a single registry value record.
- * This contructor is private. Objects of this type are created internally and returned by methods of {@link Registry} objects.
- *
- * @private
- * @class
- *
- * @param {string} host - the hostname
- * @param {string} hive - the hive id
- * @param {string} key - the registry key
- * @param {string} name - the value name
- * @param {string} type - the value type
- * @param {string} value - the value
- * @param {string} arch - the hive architecture ('x86' or 'x64')
- *
- */
-function RegistryItem(host, hive, key, name, type, value, arch):void {
-
-  if (!(this instanceof RegistryItem))
-    return new RegistryItem(host, hive, key, name, type, value, arch);
-
-  /* private members */
-  let _host = host    // hostname
-    , _hive = hive    // registry hive
-    , _key = key      // registry key
-    , _name = name    // property name
-    , _type = type    // property type
-    , _value = value  // property value
-    , _arch = arch    // hive architecture
-
-  /* getters/setters */
-
-  /**
-   * The hostname.
-   * @readonly
-   * @member {string} RegistryItem#host
-   */
-  this.__defineGetter__('host', function () { return _host; });
-
-  /**
-   * The hive id.
-   * @readonly
-   * @member {string} RegistryItem#hive
-   */
-  this.__defineGetter__('hive', function () { return _hive; });
-
-  /**
-   * The registry key.
-   * @readonly
-   * @member {string} RegistryItem#key
-   */
-  this.__defineGetter__('key', function () { return _key; });
-
-  /**
-   * The value name.
-   * @readonly
-   * @member {string} RegistryItem#name
-   */
-  this.__defineGetter__('name', function () { return _name; });
-
-  /**
-   * The value type.
-   * @readonly
-   * @member {string} RegistryItem#type
-   */
-  this.__defineGetter__('type', function () { return _type; });
-
-  /**
-   * The value.
-   * @readonly
-   * @member {string} RegistryItem#value
-   */
-  this.__defineGetter__('value', function () { return _value; });
-
-  /**
-   * The hive architecture.
-   * @readonly
-   * @member {string} RegistryItem#arch
-   */
-  this.__defineGetter__('arch', function () { return _arch; });
-
-}
-
-util.inherits(RegistryItem, Object);
 
 /**
  * Creates a registry object, which provides access to a single registry key.
@@ -344,85 +212,95 @@ Registry.HKLM = HKLM;
 Registry.HKCU = HKCU;
 
 /**
- * Registry hive key HKEY_CLASSES_ROOT.
- * Note: For writing to this hive your program has to run with admin privileges.
- * @type {string}
- */
-Registry.HKCR = HKCR;
-
-/**
- * Registry hive key HKEY_USERS.
- * Note: For writing to this hive your program has to run with admin privileges.
- * @type {string}
- */
-Registry.HKU = HKU;
-
-/**
- * Registry hive key HKEY_CURRENT_CONFIG.
- * Note: For writing to this hive your program has to run with admin privileges.
- * @type {string}
- */
-Registry.HKCC = HKCC;
-
-/**
  * Collection of available registry hive keys.
  * @type {array}
  */
 Registry.HIVES = HIVES;
 
 /**
- * Registry value type STRING.
- * @type {string}
+ * Creates a single registry value record.
+ * This contructor is private. Objects of this type are created internally and returned by methods of {@link Registry} objects.
+ *
+ * @private
+ * @class
+ *
+ * @param {string} host - the hostname
+ * @param {string} hive - the hive id
+ * @param {string} key - the registry key
+ * @param {string} name - the value name
+ * @param {string} type - the value type
+ * @param {string} value - the value
+ * @param {string} arch - the hive architecture ('x86' or 'x64')
+ *
  */
-Registry.REG_SZ = REG_SZ;
+function RegistryItem(host, hive, key, name, type, value, arch):void {
 
-/**
- * Registry value type MULTILINE_STRING.
- * @type {string}
- */
-Registry.REG_MULTI_SZ = REG_MULTI_SZ;
+  if (!(this instanceof RegistryItem))
+    return new RegistryItem(host, hive, key, name, type, value, arch);
 
-/**
- * Registry value type EXPANDABLE_STRING.
- * @type {string}
- */
-Registry.REG_EXPAND_SZ = REG_EXPAND_SZ;
+  /* private members */
+  let _host = host    // hostname
+      , _hive = hive    // registry hive
+      , _key = key      // registry key
+      , _name = name    // property name
+      , _type = type    // property type
+      , _value = value  // property value
+      , _arch = arch    // hive architecture
 
-/**
- * Registry value type DOUBLE_WORD.
- * @type {string}
- */
-Registry.REG_DWORD = REG_DWORD;
+  /* getters/setters */
 
-/**
- * Registry value type QUAD_WORD.
- * @type {string}
- */
-Registry.REG_QWORD = REG_QWORD;
+  /**
+   * The hostname.
+   * @readonly
+   * @member {string} RegistryItem#host
+   */
+  this.__defineGetter__('host', function () { return _host; });
 
-/**
- * Registry value type BINARY.
- * @type {string}
- */
-Registry.REG_BINARY = REG_BINARY;
+  /**
+   * The hive id.
+   * @readonly
+   * @member {string} RegistryItem#hive
+   */
+  this.__defineGetter__('hive', function () { return _hive; });
 
-/**
- * Registry value type UNKNOWN.
- * @type {string}
- */
-Registry.REG_NONE = REG_NONE;
+  /**
+   * The registry key.
+   * @readonly
+   * @member {string} RegistryItem#key
+   */
+  this.__defineGetter__('key', function () { return _key; });
 
-/**
- * Collection of available registry value types.
- * @type {array}
- */
-Registry.REG_TYPES = REG_TYPES;
+  /**
+   * The value name.
+   * @readonly
+   * @member {string} RegistryItem#name
+   */
+  this.__defineGetter__('name', function () { return _name; });
 
-/**
- * The name of the default value. May be used instead of the empty string literal for better readability.
- * @type {string}
- */
-Registry.DEFAULT_VALUE = DEFAULT_VALUE;
+  /**
+   * The value type.
+   * @readonly
+   * @member {string} RegistryItem#type
+   */
+  this.__defineGetter__('type', function () { return _type; });
+
+  /**
+   * The value.
+   * @readonly
+   * @member {string} RegistryItem#value
+   */
+  this.__defineGetter__('value', function () { return _value; });
+
+  /**
+   * The hive architecture.
+   * @readonly
+   * @member {string} RegistryItem#arch
+   */
+  this.__defineGetter__('arch', function () { return _arch; });
+
+}
+
+util.inherits(RegistryItem, Object);
 
 /**
  * Retrieve all values from this registry key.
@@ -445,9 +323,9 @@ Registry.prototype.values = function values(cb) {
     env: process.env,
     stdio: ['ignore', 'pipe', 'pipe']
   })
-    , buffer = ''
-    , self = this
-    , error = null // null means no error previously reported.
+      , buffer = ''
+      , self = this
+      , error = null // null means no error previously reported.
 
   let output = captureOutput(proc);
 
@@ -459,9 +337,9 @@ Registry.prototype.values = function values(cb) {
       cb(mkErrorMsg('QUERY', code, output), null);
     } else {
       let items = []
-        , result = []
-        , lines = buffer.split('\n')
-        , lineNumber = 0
+          , result = []
+          , lines = buffer.split('\n')
+          , lineNumber = 0
 
       for (let i = 0, l = lines.length; i < l; i++) {
         let line = lines[i].trim();
@@ -477,9 +355,9 @@ Registry.prototype.values = function values(cb) {
       for (let i = 0, l = items.length; i < l; i++) {
 
         let match = ITEM_PATTERN.exec(items[i])
-          , name
-          , type
-          , value
+            , name
+            , type
+            , value
 
         if (match) {
           name = match[1].trim();
@@ -592,400 +470,3 @@ Registry.prototype.keys = function keys(cb) {
   return this;
 };
 
-/**
- * Gets a named value from this registry key.
- * @param {string} name - the value name, use {@link Registry.DEFAULT_VALUE} or an empty string for the default value
- * @param {function (err, item)} cb - callback function
- * @param {ProcessUncleanExitError=} cb.err - error object or null if successful
- * @param {RegistryItem=} cb.item - the retrieved registry item
- * @returns {Registry} this registry key object
- */
-Registry.prototype.get = function get(name, cb) {
-
-  if (typeof cb !== 'function')
-    throw new TypeError('must specify a callback');
-
-  let args = ['QUERY', this.path];
-  if (name == '')
-    args.push('/ve');
-  else
-    args = args.concat(['/v', name]);
-
-  pushArch(args, this.arch);
-
-  let proc = spawn(getRegExePath(), args, {
-    cwd: undefined,
-    env: process.env,
-    stdio: ['ignore', 'pipe', 'pipe']
-  })
-    , buffer = ''
-    , self = this
-    , error = null // null means no error previously reported.
-
-  let output = captureOutput(proc);
-
-  proc.on('close', function (code) {
-    if (error) {
-      return;
-    } else if (code !== 0) {
-      log('process exited with code ' + code);
-      cb(mkErrorMsg('QUERY', code, output), null);
-    } else {
-      let items = []
-        , result = null
-        , lines = buffer.split('\n')
-        , lineNumber = 0
-
-      for (let i = 0, l = lines.length; i < l; i++) {
-        let line = lines[i].trim();
-        if (line.length > 0) {
-          log(line);
-          if (lineNumber != 0) {
-            items.push(line);
-          }
-          ++lineNumber;
-        }
-      }
-
-      //Get last item - so it works in XP where REG QUERY returns with a header
-      let item = items[items.length - 1] || ''
-        , match = ITEM_PATTERN.exec(item)
-        , name
-        , type
-        , value
-
-      if (match) {
-        name = match[1].trim();
-        type = match[2].trim();
-        value = match[3];
-        result = new RegistryItem(self.host, self.hive, self.key, name, type, value, self.arch);
-      }
-
-      cb(null, result);
-    }
-  });
-
-  proc.stdout.on('data', function (data) {
-    buffer += data.toString();
-  });
-
-  proc.on('error', function (err) {
-    error = err;
-    cb(err);
-  });
-
-  return this;
-};
-
-/**
- * Sets a named value in this registry key, overwriting an already existing value.
- * @param {string} name - the value name, use {@link Registry.DEFAULT_VALUE} or an empty string for the default value
- * @param {string} type - the value type
- * @param {string} value - the value
- * @param {function (err)} cb - callback function
- * @param {ProcessUncleanExitError=} cb.err - error object or null if successful
- * @returns {Registry} this registry key object
- */
-Registry.prototype.set = function set(name, type, value, cb) {
-
-  if (typeof cb !== 'function')
-    throw new TypeError('must specify a callback');
-
-  if (REG_TYPES.indexOf(type) == -1)
-    throw Error('illegal type specified.');
-
-  let args = ['ADD', this.path];
-  if (name == '')
-    args.push('/ve');
-  else
-    args = args.concat(['/v', name]);
-
-  args = args.concat(['/t', type, '/d', value, '/f']);
-
-  pushArch(args, this.arch);
-
-  let proc = spawn(getRegExePath(), args, {
-    cwd: undefined,
-    env: process.env,
-    stdio: ['ignore', 'pipe', 'pipe']
-  })
-    , error = null // null means no error previously reported.
-
-  let output = captureOutput(proc);
-
-  proc.on('close', function (code) {
-    if (error) {
-      return;
-    } else if (code !== 0) {
-      log('process exited with code ' + code);
-      cb(mkErrorMsg('ADD', code, output));
-    } else {
-      cb(null);
-    }
-  });
-
-  proc.stdout.on('data', function (data) {
-    // simply discard output
-    log('' + data);
-  });
-
-  proc.on('error', function (err) {
-    error = err;
-    cb(err);
-  });
-
-  return this;
-};
-
-/**
- * Remove a named value from this registry key. If name is empty, sets the default value of this key.
- * Note: This key must be already existing.
- * @param {string} name - the value name, use {@link Registry.DEFAULT_VALUE} or an empty string for the default value
- * @param {function (err)} cb - callback function
- * @param {ProcessUncleanExitError=} cb.err - error object or null if successful
- * @returns {Registry} this registry key object
- */
-Registry.prototype.remove = function remove(name, cb) {
-
-  if (typeof cb !== 'function')
-    throw new TypeError('must specify a callback');
-
-  let args = name ? ['DELETE', this.path, '/f', '/v', name] : ['DELETE', this.path, '/f', '/ve'];
-
-  pushArch(args, this.arch);
-
-  let proc = spawn(getRegExePath(), args, {
-    cwd: undefined,
-    env: process.env,
-    stdio: ['ignore', 'pipe', 'pipe']
-  })
-    , error = null // null means no error previously reported.
-
-  let output = captureOutput(proc);
-
-  proc.on('close', function (code) {
-    if (error) {
-      return;
-    } else if (code !== 0) {
-      log('process exited with code ' + code);
-      cb(mkErrorMsg('DELETE', code, output), null);
-    } else {
-      cb(null);
-    }
-  });
-
-  proc.stdout.on('data', function (data) {
-    // simply discard output
-    log('' + data);
-  });
-
-  proc.on('error', function (err) {
-    error = err;
-    cb(err);
-  });
-
-  return this;
-};
-
-/**
- * Remove all subkeys and values (including the default value) from this registry key.
- * @param {function (err)} cb - callback function
- * @param {ProcessUncleanExitError=} cb.err - error object or null if successful
- * @returns {Registry} this registry key object
- */
-Registry.prototype.clear = function clear(cb) {
-
-  if (typeof cb !== 'function')
-    throw new TypeError('must specify a callback');
-
-  let args = ['DELETE', this.path, '/f', '/va'];
-
-  pushArch(args, this.arch);
-
-  let proc = spawn(getRegExePath(), args, {
-    cwd: undefined,
-    env: process.env,
-    stdio: ['ignore', 'pipe', 'pipe']
-  })
-    , error = null // null means no error previously reported.
-
-  let output = captureOutput(proc);
-
-  proc.on('close', function (code) {
-    if (error) {
-      return;
-    } else if (code !== 0) {
-      log('process exited with code ' + code);
-      cb(mkErrorMsg("DELETE", code, output), null);
-    } else {
-      cb(null);
-    }
-  });
-
-  proc.stdout.on('data', function (data) {
-    // simply discard output
-    log('' + data);
-  });
-
-  proc.on('error', function (err) {
-    error = err;
-    cb(err);
-  });
-
-  return this;
-};
-
-/**
- * Alias for the clear method to keep it backward compatible.
- * @method
- * @deprecated Use {@link Registry#clear} or {@link Registry#destroy} in favour of this method.
- * @param {function (err)} cb - callback function
- * @param {ProcessUncleanExitError=} cb.err - error object or null if successful
- * @returns {Registry} this registry key object
- */
-Registry.prototype.erase = Registry.prototype.clear;
-
-/**
- * Delete this key and all subkeys from the registry.
- * @param {function (err)} cb - callback function
- * @param {ProcessUncleanExitError=} cb.err - error object or null if successful
- * @returns {Registry} this registry key object
- */
-Registry.prototype.destroy = function destroy(cb) {
-
-  if (typeof cb !== 'function')
-    throw new TypeError('must specify a callback');
-
-  let args = ['DELETE', this.path, '/f'];
-
-  pushArch(args, this.arch);
-
-  let proc = spawn(getRegExePath(), args, {
-    cwd: undefined,
-    env: process.env,
-    stdio: ['ignore', 'pipe', 'pipe']
-  })
-    , error = null // null means no error previously reported.
-
-  let output = captureOutput(proc);
-
-  proc.on('close', function (code) {
-    if (error) {
-      return;
-    } else if (code !== 0) {
-      log('process exited with code ' + code);
-      cb(mkErrorMsg('DELETE', code, output), null);
-    } else {
-      cb(null);
-    }
-  });
-
-  proc.stdout.on('data', function (data) {
-    // simply discard output
-    log('' + data);
-  });
-
-  proc.on('error', function (err) {
-    error = err;
-    cb(err);
-  });
-
-  return this;
-};
-
-/**
- * Create this registry key. Note that this is a no-op if the key already exists.
- * @param {function (err)} cb - callback function
- * @param {ProcessUncleanExitError=} cb.err - error object or null if successful
- * @returns {Registry} this registry key object
- */
-Registry.prototype.create = function create(cb) {
-
-  if (typeof cb !== 'function')
-    throw new TypeError('must specify a callback');
-
-  let args = ['ADD', this.path, '/f'];
-
-  pushArch(args, this.arch);
-
-  let proc = spawn(getRegExePath(), args, {
-    cwd: undefined,
-    env: process.env,
-    stdio: ['ignore', 'pipe', 'pipe']
-  })
-    , error = null // null means no error previously reported.
-
-  let output = captureOutput(proc);
-
-  proc.on('close', function (code) {
-    if (error) {
-      return;
-    } else if (code !== 0) {
-      log('process exited with code ' + code);
-      cb(mkErrorMsg('ADD', code, output), null);
-    } else {
-      cb(null);
-    }
-  });
-
-  proc.stdout.on('data', function (data) {
-    // simply discard output
-    log('' + data);
-  });
-
-  proc.on('error', function (err) {
-    error = err;
-    cb(err);
-  });
-
-  return this;
-};
-
-/**
- * Checks if this key already exists.
- * @param {function (err, exists)} cb - callback function
- * @param {ProcessUncleanExitError=} cb.err - error object or null if successful
- * @param {boolean=} cb.exists - true if a registry key with this name already exists
- * @returns {Registry} this registry key object
- */
-Registry.prototype.keyExists = function keyExists(cb) {
-
-  this.values(function (err, items) {
-    if (err) {
-      // process should return with code 1 if key not found
-      if (err.code == 1) {
-        return cb(null, false);
-      }
-      // other error
-      return cb(err);
-    }
-    cb(null, true);
-  });
-
-  return this;
-};
-
-/**
- * Checks if a value with the given name already exists within this key.
- * @param {string} name - the value name, use {@link Registry.DEFAULT_VALUE} or an empty string for the default value
- * @param {function (err, exists)} cb - callback function
- * @param {ProcessUncleanExitError=} cb.err - error object or null if successful
- * @param {boolean=} cb.exists - true if a value with the given name was found in this key
- * @returns {Registry} this registry key object
- */
-Registry.prototype.valueExists = function valueExists(name, cb) {
-
-  this.get(name, function (err, item) {
-    if (err) {
-      // process should return with code 1 if value not found
-      if (err.code == 1) {
-        return cb(null, false);
-      }
-      // other error
-      return cb(err);
-    }
-    cb(null, true);
-  });
-
-  return this;
-};
